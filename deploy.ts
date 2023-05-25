@@ -1,29 +1,31 @@
-import {
-  Application,
-  Context,
-  Router,
-  Status,
-} from "oak/mod.ts";
+import { Application, Context, Router, Status } from "oak/mod.ts";
 
-const url = "https://s3.spilleman.nl/shared/gps.ical";
-let ical: string | undefined = undefined;
-let updated = new Date().getTime();
+// const url = "https://s3.spilleman.nl/shared/gps.ical";
+// let ical: string | undefined = undefined;
+
+// async function getIcal() {
+//   const now = new Date().getTime();
+//   if (ical && (now - updated) < 1000 * 1800) {
+//     return ical;
+//   }
+//   const response = await fetch(url);
+//   if (response.ok) {
+//     ical = await response.text();
+//     updated = now;
+//     return ical;
+//   } else {
+//     console.log(`Error: ${url}`);
+//     if (ical) return ical;
+//     return undefined;
+//   }
+// }
 
 async function getIcal() {
-  const now = new Date().getTime();
-  if (ical && (now - updated) < 1000 * 1800) {
-    return ical;
+  const file = await Deno.readTextFile("./gps.ical");
+  if (file) {
+    return file;
   }
-  const response = await fetch(url);
-  if (response.ok) {
-    ical = await response.text();
-    updated = now;
-    return ical;
-  } else {
-    console.log(`Error: ${url}`);
-    if (ical) return ical;
-    return undefined;
-  }
+  return undefined;
 }
 
 const router: Router = new Router();
