@@ -1,4 +1,9 @@
-import { Application, Context, Router, Status } from "https://deno.land/x/oak@v12.5.0/mod.ts";
+import {
+  Application,
+  Context,
+  Router,
+  Status,
+} from "https://deno.land/x/oak@v12.5.0/mod.ts";
 
 // const url = "https://s3.spilleman.nl/shared/gps.ical";
 // let ical: string | undefined = undefined;
@@ -43,10 +48,12 @@ router.get("/", async (ctx: Context) => {
   }
 });
 
+console.log(Deno.cwd());
 const app = new Application();
 app.addEventListener("listen", (e) => console.log(`Listen: ${e.port}`));
 app.use(router.routes());
 app.use(router.allowedMethods());
 app.listen({ port: 10101 });
+
 
 // http://localhost:10101
