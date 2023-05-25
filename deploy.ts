@@ -1,4 +1,4 @@
-import { Application, Context, Router, Status } from "oak/mod.ts";
+import { Application, Context, Router, Status } from "https://deno.land/x/oak@v12.5.0/mod.ts";
 
 // const url = "https://s3.spilleman.nl/shared/gps.ical";
 // let ical: string | undefined = undefined;
