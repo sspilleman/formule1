@@ -1,9 +1,16 @@
+// import {
+//   Application,
+//   Context,
+//   Router,
+//   Status,
+// } from "https://deno.land/x/oak@v12.5.0/mod.ts";
+
 import {
   Application,
   Context,
   Router,
   Status,
-} from "https://deno.land/x/oak@v12.5.0/mod.ts";
+} from "oak/mod.ts";
 
 // const url = "https://s3.spilleman.nl/shared/gps.ical";
 // let ical: string | undefined = undefined;
@@ -57,3 +64,5 @@ app.listen({ port: 10101 });
 
 
 // http://localhost:10101
+
+// deno bundle --config ./deno.tsconfig.json --import-map deps.json formule1/web.ts formule1/deploy.ts
