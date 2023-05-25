@@ -1,7 +1,9 @@
 import cheerio, {} from "cheerio";
 import { getText } from "../lib/http/mod.ts";
-import { parse } from "https://cdn.skypack.dev/date-fns?dts";
-import enUS from "https://cdn.skypack.dev/date-fns/locale/en-US/index.js";
+
+import { parse } from "date-fns/index.js";
+import enUS from "date-fns/locale/en-US/index.js";
+
 import { GP } from "./interfaces.ts";
 
 const year = "2023";

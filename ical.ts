@@ -1,46 +1,19 @@
 import * as tz from "npm/ical-timezones/index.ts";
-import iCal, {
+import ical, {
   ICalAlarm,
   ICalAlarmType,
-  ICalDescription,
   ICalEvent,
-  ICalEventData,
   ICalEventTransparency,
 } from "ical-generator";
+// "ical-generator": "https://unpkg.com/ical-generator@4.1.0/dist/index.cjs",
 import { GP } from "./interfaces.ts";
 
 const newline = `\n`;
 const x = { "X-APPLE-TRAVEL-ADVISORY-BEHAVIOR": "AUTOMATIC" };
 
-// function TzGenerator(tx: string) {
-//   const lines = [
-//     "BEGIN:VTIMEZONE",
-//     "TZID:Europe/Amsterdam",
-//     "TZURL:http://tzurl.org/zoneinfo-outlook/Europe/Amsterdam",
-//     "X-LIC-LOCATION:Europe/Amsterdam",
-//     "BEGIN:DAYLIGHT",
-//     "TZOFFSETFROM:+0100",
-//     "TZOFFSETTO:+0200",
-//     "TZNAME:CEST",
-//     "DTSTART:19700329T020000",
-//     "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU",
-//     "END:DAYLIGHT",
-//     "BEGIN:STANDARD",
-//     "TZOFFSETFROM:+0200",
-//     "TZOFFSETTO:+0100",
-//     "TZNAME:CET",
-//     "DTSTART:19701025T030000",
-//     "RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU",
-//     "END:STANDARD",
-//     "END:VTIMEZONE",
-//     "END:VCALENDAR",
-//   ];
-//   return lines.join("\n");
-// }
-
 function getIcal(gps: GP[]) {
   const timezone = "Europe/Amsterdam";
-  const cal = iCal({
+  const cal = ical({
     name: "Formula 1",
     description: "Race Events",
     // timezone,
@@ -63,9 +36,9 @@ function getIcal(gps: GP[]) {
         lines = gp.stats.map((d) => `${d.name}: ${d.value}`);
       }
       lines.push(`${newline}https://viaplay.com/sport/motorsport/formula-1`);
-      const description: ICalDescription = { plain: lines.join(newline) };
+      const description = { plain: lines.join(newline) };
       const current = new Date();
-      const data: ICalEventData = {
+      const data = {
         allDay: false,
         start: event.start,
         end: event.end,
@@ -75,7 +48,6 @@ function getIcal(gps: GP[]) {
         lastModified: current,
         transparency: ICalEventTransparency.OPAQUE,
         x,
-        // location: "https://viaplay.com/sport/motorsport/formula-1",
         floating: false,
         timezone,
       };
