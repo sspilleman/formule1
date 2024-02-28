@@ -1,10 +1,11 @@
-import * as tz from "npm/ical-timezones/index.ts";
+// import * as tz from "npm/ical-timezones-obsolete/index.ts";
+import tz from "npm:@touch4it/ical-timezones@1.9.0";
 import ical, {
   ICalAlarm,
   ICalAlarmType,
   ICalEvent,
   ICalEventTransparency,
-} from "ical-generator";
+} from "npm:ical-generator@5.0.0";
 // "ical-generator": "https://unpkg.com/ical-generator@4.1.0/dist/index.cjs",
 import { GP } from "./interfaces.ts";
 
@@ -63,7 +64,7 @@ function getIcal(gps: GP[]) {
   return cal.toString();
 }
 
-import gps from "./gps.json" assert { type: "json" };
+import gps from "./gps.json" with { type: "json" };
 const txt = getIcal(gps);
 console.log(txt);
 await Deno.writeTextFile("./formule1/gps.ical", txt);

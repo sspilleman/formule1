@@ -6,7 +6,7 @@ import enUS from "date-fns/locale/en-US/index.js";
 
 import { GP } from "./interfaces.ts";
 
-const year = "2023";
+const year = "2024";
 const calender = `https://www.formule1.nl/wk-kalender/${year}/`;
 
 const selectors = {
@@ -74,7 +74,8 @@ async function getGP(gp: GP) {
         { locale: enUS },
       );
       // console.log({ name, date, time, d });
-      const r = /^(\d{1,2}:\d{1,2})\n {0,1}- (\d{1,2}:\d{1,2})$/i;
+      // const r = /^(\d{1,2}:\d{1,2})\n {0,1}- (\d{1,2}:\d{1,2})$/i;
+      const r = /^(\d{1,2}:\d{1,2}) - (\d{1,2}:\d{1,2})$/i;
       if (d && r.exec(time)) {
         const [_, startStr, endStr] = r.exec(time) as RegExpExecArray;
         const days = startStr > endStr ? 1 : 0;
