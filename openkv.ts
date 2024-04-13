@@ -8,7 +8,7 @@ export const getGPS = async (year: number) => {
   const entries = kv.list<GP>({ prefix: ["gps", year] });
   const gps: GP[] = [];
   for await (const gp of entries) {
-    console.log(gp.key, gp.value);
+    // console.log(gp.key, gp.value);
     gps.push(gp.value);
   }
   return gps;
