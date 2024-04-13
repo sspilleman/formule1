@@ -6,13 +6,13 @@ import ical, {
   ICalEvent,
   ICalEventTransparency,
 } from "npm:ical-generator@5.0.0";
-// "ical-generator": "https://unpkg.com/ical-generator@4.1.0/dist/index.cjs",
 import { GP } from "./interfaces.ts";
+import { getGPS } from "./openkv.ts";
 
 const newline = `\n`;
 const x = { "X-APPLE-TRAVEL-ADVISORY-BEHAVIOR": "AUTOMATIC" };
 
-function getIcal(gps: GP[]) {
+function getText(gps: GP[]) {
   const timezone = "Europe/Amsterdam";
   const cal = ical({
     name: "Formula 1",
@@ -64,11 +64,10 @@ function getIcal(gps: GP[]) {
   return cal.toString();
 }
 
-import gps from "./gps.json" with { type: "json" };
-const txt = getIcal(gps);
-console.log(txt);
-await Deno.writeTextFile("./formule1/gps.ical", txt);
+export const getIcal = async (year: number) => {
+  const gps = await getGPS(year);
+  const txt = getText(gps);
+  return txt;
+};
 
-// import * as tz from "npm/ical-timezones/index.ts";
-// const vtimezone = tz.getVtimezone("Europe/Amsterdamn");
-// console.log(vtimezone);
+// console.log(await getIcal(2024));

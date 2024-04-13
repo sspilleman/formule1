@@ -1,12 +1,13 @@
-import cheerio, {} from "cheerio";
-import { getText } from "../lib/http/mod.ts";
-
+import cheerio from "cheerio";
+import { GP } from "./interfaces.ts";
 import { parse } from "date-fns/index.js";
 import enUS from "date-fns/locale/en-US/index.js";
 
-import { GP } from "./interfaces.ts";
+const formule1 =
+  "https://api.deno.com/databases/59849518-4816-42e8-84cf-4a0609d33c93/connect";
+const kv = await Deno.openKv(formule1);
 
-const year = "2024";
+const year = 2024;
 const calender = `https://www.formule1.nl/wk-kalender/${year}/`;
 
 const selectors = {
@@ -28,64 +29,70 @@ const selectors = {
 };
 
 async function getGPS(url: string) {
-  const txt = await getText(url);
-  const $ = cheerio.load(txt);
-  const $rows = $(selectors.gps.rows);
-  const gps: GP[] = [];
-  $rows.each(function (_i, e) {
-    const $row = $(e);
-    const name = $row.find(selectors.gps.link).text().trim();
-    const url = <string> $row.find(selectors.gps.link).attr("href")?.trim();
-    gps.push({ name, url, stats: [], events: [] });
-  });
-  return gps;
+  const response = await fetch(url);
+  if (response.ok) {
+    const txt = await response.text();
+    const $ = cheerio.load(txt);
+    const $rows = $(selectors.gps.rows);
+    const gps: GP[] = [];
+    $rows.each(function (_i, e) {
+      const $row = $(e);
+      const name = $row.find(selectors.gps.link).text().trim();
+      const url = <string> $row.find(selectors.gps.link).attr("href")?.trim();
+      gps.push({ name, url, stats: [], events: [] });
+    });
+    return gps;
+  } else return [];
 }
 
 async function getGP(gp: GP) {
-  const txt = await getText(gp.url);
-  const $ = cheerio.load(txt);
-  const image = $(selectors.gp.image);
-  if (image) {
-    gp.image = $(selectors.gp.image).first().attr("src") as string;
-  }
-  const $stats = $(selectors.gp.stats);
-  if ($stats && $stats.length > 0) {
-    $stats.each(function (_i, e) {
-      const $stat = $(e);
-      const name = $stat.find(selectors.gp.key).text().trim();
-      const value = $stat.find(selectors.gp.value).text().trim();
-      gp.stats.push({ name, value });
-    });
-  }
-  const $events = $(selectors.gp.events);
-  if ($events && $events.length > 0) {
-    $events.each(function (_i, e) {
-      const $event = $(e);
-      const name = $event.find(selectors.gp.name).text().trim();
-      const date = $event.find(selectors.gp.date).text().trim();
-      const time = $event.find(selectors.gp.time).text().trim();
-      const d: Date | undefined = parse(
-        date
-          .replace("mrt", "mar")
-          .replace("mei", "may")
-          .replace("okt", "oct"),
-        "dd MMM yyyy",
-        new Date(),
-        { locale: enUS },
-      );
-      // console.log({ name, date, time, d });
-      // const r = /^(\d{1,2}:\d{1,2})\n {0,1}- (\d{1,2}:\d{1,2})$/i;
-      const r = /^(\d{1,2}:\d{1,2}) - (\d{1,2}:\d{1,2})$/i;
-      if (d && r.exec(time)) {
-        const [_, startStr, endStr] = r.exec(time) as RegExpExecArray;
-        const days = startStr > endStr ? 1 : 0;
-        const start = parse(startStr, "HH:mm", d, { locale: enUS });
-        const end = addDays(parse(endStr, "HH:mm", d, { locale: enUS }), days);
-        const event = { name, start, end };
-        // console.log({ event });
-        gp.events.push(event);
-      } else console.log(time);
-    });
+  const response = await fetch(gp.url);
+  if (response.ok) {
+    const txt = await response.text();
+    const $ = cheerio.load(txt);
+    const image = $(selectors.gp.image);
+    if (image) {
+      gp.image = $(selectors.gp.image).first().attr("src") as string;
+    }
+    const $stats = $(selectors.gp.stats);
+    if ($stats && $stats.length > 0) {
+      $stats.each(function (_i, e) {
+        const $stat = $(e);
+        const name = $stat.find(selectors.gp.key).text().trim();
+        const value = $stat.find(selectors.gp.value).text().trim();
+        gp.stats.push({ name, value });
+      });
+    }
+    const $events = $(selectors.gp.events);
+    if ($events && $events.length > 0) {
+      $events.each(function (_i, e) {
+        const $event = $(e);
+        const name = $event.find(selectors.gp.name).text().trim();
+        const date = $event.find(selectors.gp.date).text().trim();
+        const time = $event.find(selectors.gp.time).text().trim();
+        const d: Date | undefined = parse(
+          date
+            .replace("mrt", "mar")
+            .replace("mei", "may")
+            .replace("okt", "oct"),
+          "dd MMM yyyy",
+          new Date(),
+          { locale: enUS },
+        );
+        const r = /^(\d{1,2}:\d{1,2}) - (\d{1,2}:\d{1,2})$/i;
+        if (d && r.exec(time)) {
+          const [_, startStr, endStr] = r.exec(time) as RegExpExecArray;
+          const days = startStr > endStr ? 1 : 0;
+          const start = parse(startStr, "HH:mm", d, { locale: enUS });
+          const end = addDays(
+            parse(endStr, "HH:mm", d, { locale: enUS }),
+            days,
+          );
+          const event = { name, start, end };
+          gp.events.push(event);
+        } else console.log(time);
+      });
+    }
   }
 }
 
@@ -97,18 +104,17 @@ function addDays(src: Date, count: number) {
 async function create() {
   const gps = await getGPS(calender);
   for (const gp of gps) {
-    // if (gp.name === `GP Miami`) {
-    //   console.log(gp.name);
-    //   await getGP(gp);
-    // }
     console.log(gp.name);
     await getGP(gp);
+    if (gp.events.length > 0) {
+      await kv.set(["gps", year, gp.name], gp);
+    }
   }
   // console.log(gps);
-  await Deno.writeTextFile(
-    "./formule1/gps.json",
-    JSON.stringify(gps, undefined, "  "),
-  );
+  // await Deno.writeTextFile(
+  //   "./formule1/gps.json",
+  //   JSON.stringify(gps, undefined, "  "),
+  // );
 }
 
 await create();
