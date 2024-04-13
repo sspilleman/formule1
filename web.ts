@@ -1,4 +1,4 @@
-import { Application, Context, Router, Status } from "oak/mod.ts";
+import { Application, Context, Router, Status } from "https://deno.land/x/oak@14.2.0/mod.ts";
 import { getIcal } from "./ical.ts";
 
 const router: Router = new Router();
