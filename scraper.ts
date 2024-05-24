@@ -99,13 +99,13 @@ async function getGP(gp: GP) {
         if (d && r.exec(time)) {
           const [_, startStr, endStr] = r.exec(time) as RegExpExecArray;
           const days = startStr > endStr ? 1 : 0;
-          const start = parse(startStr, "HH:mm", d, { locale: enUS }).getTime();
+          const start = parse(startStr, "HH:mm", d, { locale: nl }).getTime();
           const end = addDays(
             parse(endStr, "HH:mm", d, { locale: nl }),
             days,
           ).getTime();
-          // console.log({ start, end });
           const event = { name, start, end };
+          console.log({ name, start, end });
           gp.events.push(event);
         } else console.log(time);
       });
@@ -119,8 +119,8 @@ function addDays(src: Date, count: number) {
 }
 
 async function create() {
-  // const gps = (await getGPS(calender)).filter((g) => g.name === "GP Monaco");
-  const gps = await getGPS(calender);
+  const gps = (await getGPS(calender)).filter((g) => g.name === "GP Monaco");
+  // const gps = await getGPS(calender);
   for (const gp of gps) {
     console.log(gp.name);
     await getGP(gp);
