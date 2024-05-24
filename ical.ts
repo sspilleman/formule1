@@ -41,8 +41,8 @@ function getText(gps: GP[]) {
       const current = new Date();
       const data: ICalEventData = {
         allDay: false,
-        start: new Date(event.start).toUTCString(),
-        end: new Date(event.end).toUTCString(),
+        start: new Date(event.start),
+        end: new Date(event.end),
         summary: `${gp.name}: ${event.name}`,
         description,
         created: current,
