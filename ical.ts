@@ -1,11 +1,10 @@
-// import * as tz from "npm/ical-timezones-obsolete/index.ts";
 import tz from "npm:@touch4it/ical-timezones@1.9.0";
 import ical, {
-  ICalAlarm,
   ICalAlarmType,
   ICalEvent,
+  ICalEventData,
   ICalEventTransparency,
-} from "npm:ical-generator@5.0.0";
+} from "npm:ical-generator@7.1.0";
 import { GP } from "./interfaces.ts";
 import { getGPS } from "./openkv.ts";
 
@@ -39,10 +38,10 @@ function getText(gps: GP[]) {
       lines.push(`${newline}https://viaplay.com/sport/motorsport/formula-1`);
       const description = { plain: lines.join(newline) };
       const current = new Date();
-      const data = {
+      const data: ICalEventData = {
         allDay: false,
-        start: event.start,
-        end: event.end,
+        start: new Date(event.start),
+        end: new Date(event.end),
         summary: `${gp.name}: ${event.name}`,
         description,
         created: current,
@@ -53,21 +52,18 @@ function getText(gps: GP[]) {
         timezone,
       };
       const e: ICalEvent = cal.createEvent(data);
-      const display: ICalAlarm = e.createAlarm();
-      display.trigger(3600);
-      display.type(ICalAlarmType.display);
-      const audio: ICalAlarm = e.createAlarm();
-      audio.trigger(3600);
-      audio.type(ICalAlarmType.audio);
+      e.createAlarm({ type: ICalAlarmType.display, trigger: 3600 });
+      e.createAlarm({ type: ICalAlarmType.audio, trigger: 3600 });
     }
   }
   return cal.toString();
 }
 
 export const getIcal = async (year: number) => {
-  const gps = await getGPS(year);
+  const gps = (await getGPS(year)).filter((g) => g.name === "GP Monaco");
+  // const gps = await getGPS(year);
   const txt = getText(gps);
   return txt;
 };
 
-// console.log(await getIcal(2024));
+console.log(await getIcal(2024));

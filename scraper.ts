@@ -2,6 +2,12 @@ import cheerio from "cheerio";
 import { GP } from "./interfaces.ts";
 import { parse } from "date-fns/index.js";
 import enUS from "date-fns/locale/en-US/index.js";
+import nl from "date-fns/locale/nl/index.js";
+
+Deno.env.set(
+  "DENO_KV_ACCESS_TOKEN",
+  "ddp_cT3JXelgGT26RjP1S4K7ZYQ4C3xMbw3hRZWi",
+);
 
 const formule1 =
   "https://api.deno.com/databases/59849518-4816-42e8-84cf-4a0609d33c93/connect";
@@ -72,22 +78,33 @@ async function getGP(gp: GP) {
         const time = $event.find(selectors.gp.time).text().trim();
         const d: Date | undefined = parse(
           date
-            .replace("mrt", "mar")
-            .replace("mei", "may")
-            .replace("okt", "oct"),
+            .replace("jan", "jan.")
+            .replace("feb", "feb.")
+            .replace("mrt", "mrt.")
+            .replace("apr", "apr.")
+            .replace("mei", "mei")
+            .replace("jun", "jun.")
+            .replace("jul", "jul.")
+            .replace("aug", "aug.")
+            .replace("sep", "sep.")
+            .replace("okt", "okt.")
+            .replace("nov", "nov.")
+            .replace("dec", "dec."),
           "dd MMM yyyy",
           new Date(),
-          { locale: enUS },
+          { locale: nl },
         );
+        if (isNaN(new Date(d).getTime())) console.log(date, d);
         const r = /^(\d{1,2}:\d{1,2}) - (\d{1,2}:\d{1,2})$/i;
         if (d && r.exec(time)) {
           const [_, startStr, endStr] = r.exec(time) as RegExpExecArray;
           const days = startStr > endStr ? 1 : 0;
-          const start = parse(startStr, "HH:mm", d, { locale: enUS });
+          const start = parse(startStr, "HH:mm", d, { locale: enUS }).getTime();
           const end = addDays(
-            parse(endStr, "HH:mm", d, { locale: enUS }),
+            parse(endStr, "HH:mm", d, { locale: nl }),
             days,
-          );
+          ).getTime();
+          // console.log({ start, end });
           const event = { name, start, end };
           gp.events.push(event);
         } else console.log(time);
@@ -102,6 +119,7 @@ function addDays(src: Date, count: number) {
 }
 
 async function create() {
+  // const gps = (await getGPS(calender)).filter((g) => g.name === "GP Monaco");
   const gps = await getGPS(calender);
   for (const gp of gps) {
     console.log(gp.name);

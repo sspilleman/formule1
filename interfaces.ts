@@ -5,8 +5,8 @@ interface Stat {
 
 interface Event {
   name: string;
-  start: Date | string;
-  end: Date | string;
+  start: number;
+  end: number;
 }
 
 export interface GP {
