@@ -12,7 +12,8 @@ const newline = `\n`;
 const x = { "X-APPLE-TRAVEL-ADVISORY-BEHAVIOR": "AUTOMATIC" };
 
 function getText(gps: GP[]) {
-  const timezone = "Europe/Amsterdam";
+  // const timezone = "Europe/Amsterdam";
+  const timezone = "GMT Standard Time";
   const cal = ical({
     name: "Formula 1",
     description: "Race Events",
