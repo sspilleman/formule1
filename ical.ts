@@ -20,7 +20,7 @@ function getText(gps: GP[]) {
     ttl: 3600 * 24,
     prodId: {
       company: "Sander Spilleman",
-      product: "Formulta 1 Race Events",
+      product: "Formula 1 Race Events",
       language: "NL",
     },
     // timezone: timezone,
@@ -60,10 +60,10 @@ function getText(gps: GP[]) {
 }
 
 export const getIcal = async (year: number) => {
-  const gps = (await getGPS(year)).filter((g) => g.name === "GP Monaco");
-  // const gps = await getGPS(year);
+  // const gps = (await getGPS(year)).filter((g) => g.name === "GP Monaco");
+  const gps = await getGPS(year);
   const txt = getText(gps);
   return txt;
 };
 
-console.log(await getIcal(2024));
+// console.log(await getIcal(2024));
